@@ -1,0 +1,253 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const noticias = (await getCollection('noticias')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const destaque = noticias[0];
+const secundarias = noticias.slice(1, 4);
+const restantes = noticias.slice(4);
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout title="NotíciasJá - As últimas notícias">
+  <section class="hero">
+    <div class="container">
+      {destaque && (
+        <article class="featured">
+          <a href={`/noticia/${destaque.slug}`}>
+            {destaque.data.image && (
+              <div class="featured-image">
+                <img src={destaque.data.image} alt={destaque.data.title} />
+                <span class="category-badge">{destaque.data.category}</span>
+              </div>
+            )}
+            <div class="featured-content">
+              <time>{formatDate(destaque.data.pubDate)}</time>
+              <h1>{destaque.data.title}</h1>
+              <p>{destaque.data.description}</p>
+              <span class="read-more">Ler notícia completa →</span>
+            </div>
+          </a>
+        </article>
+      )}
+    </div>
+  </section>
+
+  {secundarias.length > 0 && (
+    <section class="secondary">
+      <div class="container">
+        <div class="grid-3">
+          {secundarias.map((noticia) => (
+            <article class="card">
+              <a href={`/noticia/${noticia.slug}`}>
+                {noticia.data.image && (
+                  <div class="card-image">
+                    <img src={noticia.data.image} alt={noticia.data.title} loading="lazy" />
+                    <span class="category-badge">{noticia.data.category}</span>
+                  </div>
+                )}
+                <div class="card-content">
+                  <time>{formatDate(noticia.data.pubDate)}</time>
+                  <h3>{noticia.data.title}</h3>
+                  <p>{noticia.data.description}</p>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {restantes.length > 0 && (
+    <section class="more-news">
+      <div class="container">
+        <h2 class="section-title">Mais Notícias</h2>
+        <div class="grid-4">
+          {restantes.map((noticia) => (
+            <article class="card-small">
+              <a href={`/noticia/${noticia.slug}`}>
+                {noticia.data.image && (
+                  <div class="card-image">
+                    <img src={noticia.data.image} alt={noticia.data.title} loading="lazy" />
+                  </div>
+                )}
+                <div class="card-content">
+                  <span class="category-tag">{noticia.data.category}</span>
+                  <h4>{noticia.data.title}</h4>
+                  <time>{formatDate(noticia.data.pubDate)}</time>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .hero { padding: 40px 0 20px; }
+
+  .featured {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 40px;
+    align-items: center;
+    background: var(--color-surface);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .featured:hover { transform: translateY(-2px); }
+  .featured-image { position: relative; height: 100%; min-height: 400px; }
+  .featured-image img { width: 100%; height: 100%; object-fit: cover; }
+  .featured-content { padding: 40px 40px 40px 0; }
+  .featured-content time {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .featured-content h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    line-height: 1.15;
+    margin: 16px 0;
+    letter-spacing: -0.02em;
+  }
+  .featured-content p {
+    color: var(--color-muted);
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+    line-height: 1.7;
+  }
+  .read-more {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .category-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--color-accent);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .secondary { padding: 40px 0; }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    border-color: transparent;
+  }
+  .card-image { position: relative; aspect-ratio: 16/10; overflow: hidden; }
+  .card-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .card:hover .card-image img { transform: scale(1.05); }
+  .card-content { padding: 20px; }
+  .card-content time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .card-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    line-height: 1.3;
+    margin: 10px 0;
+    letter-spacing: -0.01em;
+  }
+  .card-content p {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .more-news { padding: 40px 0; }
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--color-text);
+    display: inline-block;
+    letter-spacing: -0.01em;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .card-small {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .card-small:hover { transform: translateY(-3px); }
+  .card-small .card-image { border-radius: 10px; }
+  .card-small .card-content { padding: 14px 0; }
+  .category-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .card-small h4 {
+    font-size: 1rem;
+    line-height: 1.35;
+    margin: 6px 0;
+    font-weight: 700;
+  }
+  .card-small time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  @media (max-width: 900px) {
+    .featured { grid-template-columns: 1fr; }
+    .featured-content { padding: 24px; }
+    .featured-content h1 { font-size: 1.75rem; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
