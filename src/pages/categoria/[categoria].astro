@@ -1,0 +1,113 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const noticias = await getCollection('noticias');
+  const categorias = [...new Set(noticias.map(n => n.data.category.toLowerCase()))];
+  return categorias.map((categoria) => ({
+    params: { categoria },
+    props: { categoria },
+  }));
+}
+
+const { categoria } = Astro.props;
+const todas = await getCollection('noticias');
+const noticias = todas
+  .filter(n => n.data.category.toLowerCase() === categoria)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout title={`${categoria} - NotíciasJá`}>
+  <section class="categoria-page">
+    <div class="container">
+      <h1 class="page-title">{categoria.charAt(0).toUpperCase() + categoria.slice(1)}</h1>
+      <p class="page-subtitle">
+        {noticias.length} notícia{noticias.length !== 1 ? 's' : ''} publicada{noticias.length !== 1 ? 's' : ''}
+      </p>
+
+      <div class="grid-3">
+        {noticias.map((noticia) => (
+          <article class="card">
+            <a href={`/noticia/${noticia.slug}`}>
+              {noticia.data.image && (
+                <div class="card-image">
+                  <img src={noticia.data.image} alt={noticia.data.title} loading="lazy" />
+                </div>
+              )}
+              <div class="card-content">
+                <time>{formatDate(noticia.data.pubDate)}</time>
+                <h3>{noticia.data.title}</h3>
+                <p>{noticia.data.description}</p>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .categoria-page { padding: 60px 0; }
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .page-subtitle {
+    color: var(--color-muted);
+    margin-bottom: 40px;
+    font-size: 0.95rem;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+  }
+  .card-image { aspect-ratio: 16/10; overflow: hidden; }
+  .card-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .card:hover .card-image img { transform: scale(1.05); }
+  .card-content { padding: 20px; }
+  .card-content time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .card-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    line-height: 1.3;
+    margin: 10px 0;
+  }
+  .card-content p {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; } }
+</style>
