@@ -1,0 +1,214 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description = 'As últimas notícias do Brasil e do mundo', image } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={image} />}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="logo">
+          <span class="logo-mark">N</span>
+          <span class="logo-text">Notícias<strong>Já</strong></span>
+        </a>
+        <nav class="main-nav">
+          <a href="/">Início</a>
+          <a href="/categoria/brasil">Brasil</a>
+          <a href="/categoria/mundo">Mundo</a>
+          <a href="/categoria/tecnologia">Tecnologia</a>
+          <a href="/categoria/esportes">Esportes</a>
+        </nav>
+        <button class="menu-toggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <span class="logo-mark">N</span>
+          <span class="logo-text">Notícias<strong>Já</strong></span>
+          <p>Informação de qualidade, todos os dias.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Categorias</h4>
+          <a href="/categoria/brasil">Brasil</a>
+          <a href="/categoria/mundo">Mundo</a>
+          <a href="/categoria/tecnologia">Tecnologia</a>
+          <a href="/categoria/esportes">Esportes</a>
+        </div>
+        <div class="footer-links">
+          <h4>Sobre</h4>
+          <a href="/rss.xml">RSS</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© {new Date().getFullYear()} NotíciasJá. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.querySelector('.menu-toggle');
+      const nav = document.querySelector('.main-nav');
+      toggle?.addEventListener('click', () => nav?.classList.toggle('open'));
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #0f0f0f;
+    --color-muted: #6b7280;
+    --color-border: #e5e7eb;
+    --color-accent: #dc2626;
+    --color-surface: #f9fafb;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --max-width: 1200px;
+    --radius: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background: var(--color-bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; height: auto; display: block; }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    gap: 32px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.25rem; }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius);
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 1.1rem;
+  }
+  .logo-text strong { color: var(--color-accent); }
+  .main-nav { display: flex; gap: 28px; }
+  .main-nav a {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    transition: color 0.2s;
+  }
+  .main-nav a:hover { color: var(--color-accent); }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 8px;
+  }
+  .menu-toggle span {
+    width: 24px; height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+  }
+
+  .site-footer {
+    background: #0f0f0f;
+    color: #d1d5db;
+    margin-top: 80px;
+    padding: 60px 0 0;
+  }
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+  .footer-brand .logo-text { color: white; }
+  .footer-brand p { margin-top: 12px; font-size: 0.9rem; color: #9ca3af; }
+  .footer-links h4 { color: white; margin-bottom: 16px; font-size: 0.95rem; }
+  .footer-links a {
+    display: block;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: white; }
+  .footer-bottom {
+    border-top: 1px solid #1f2937;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  @media (max-width: 768px) {
+    .main-nav {
+      position: absolute;
+      top: 72px; left: 0; right: 0;
+      background: white;
+      flex-direction: column;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+      transform: translateY(-120%);
+      transition: transform 0.3s;
+    }
+    .main-nav.open { transform: translateY(0); }
+    .menu-toggle { display: flex; }
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+</style>
