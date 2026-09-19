@@ -2,12 +2,6 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://seudominio.com',
+  site: 'https://guiaauto.vercel.app',
   integrations: [sitemap()],
-  markdown: {
-    shikiConfig: {
-      theme: 'github-dark',
-      wrap: true
-    }
-  }
 });
